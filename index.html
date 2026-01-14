@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>엄마표 숲유치원 수업</title>
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Jua&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* [공통 설정] */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            overflow: hidden; 
+            background-color: #333; /* 슬라이드 밖 배경색 */
+            font-family: 'Jua', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* 슬라이드 프레임 */
+        #presentation-window {
+            width: 1280px;
+            height: 720px;
+            position: relative;
+            background-color: white;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        /* 개별 슬라이드 공통 */
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: none; /* 기본적으로 숨김 */
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active {
+            display: flex; /* 활성화된 슬라이드만 보임 */
+            opacity: 1;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* [네비게이션 버튼] */
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 4px solid #4ECDC4;
+            border-radius: 50%;
+            color: #4ECDC4;
+            font-size: 30px;
+            cursor: pointer;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        .nav-btn:hover { background-color: #4ECDC4; color: white; transform: translateY(-50%) scale(1.1); }
+        #prevBtn { left: 20px; }
+        #nextBtn { right: 20px; }
+
+        /* =========================================
+           [1페이지 스타일] 
+           ========================================= */
+        #slide-1 { background-color: #FFFFFF; justify-content: center; }
+        /* Memphis Patterns */
+        #slide-1 .pattern { position: absolute; z-index: 1; }
+        #slide-1 .circle-1 { width: 150px; height: 150px; border-radius: 50%; background-color: #FFD93D; top: -50px; left: -50px; opacity: 0.8; }
+        #slide-1 .circle-2 { width: 100px; height: 100px; border-radius: 50%; border: 10px solid #4ECDC4; bottom: 50px; right: 100px; }
+        #slide-1 .triangle { width: 0; height: 0; border-left: 40px solid transparent; border-right: 40px solid transparent; border-bottom: 70px solid #FF6B6B; top: 100px; right: 150px; transform: rotate(15deg); }
+        #slide-1 .squiggle { position: absolute; top: 60%; left: 10%; width: 120px; height: 40px; background-image: url("data:image/svg+xml,%3Csvg width='40' height='10' viewBox='0 0 40 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 5 Q 10 0 20 5 T 40 5' stroke='%23FF6B6B' fill='none' stroke-width='4'/%3E%3C/svg%3E"); background-size: 40px 10px; transform: rotate(-15deg); }
+        #slide-1 .dots { position: absolute; bottom: 10%; left: 20%; width: 100px; height: 100px; background-image: radial-gradient(#4ECDC4 20%, transparent 20%); background-size: 20px 20px; }
+        
+        #slide-1 .content-wrapper { z-index: 10; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        #slide-1 .image-frame { width: 350px; height: 340px; border-radius: 50%; border: 15px solid #FFD93D; overflow: hidden; box-shadow: 10px 10px 0px #4ECDC4; background-color: #fff; display: flex; justify-content: center; align-items: center; }
+        #slide-1 .image-frame img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+        #slide-1 .title-box { background-color: #FF6B6B; padding: 20px 60px; border-radius: 50px; box-shadow: 8px 8px 0px #333; transform: rotate(-2deg); }
+        #slide-1 h1 { font-size: 72px; color: #FFFFFF; text-shadow: 2px 2px 0px rgba(0,0,0,0.1); margin: 0; line-height: 1.2; }
+        #slide-1 h2 { font-family: 'Gaegu', cursive; font-size: 48px; color: #333; margin-top: 8px; background-color: #FFD93D; padding: 10px 30px; border-radius: 30px; display: inline-block; transform: rotate(1deg); }
+        /* Floating Hangul */
+        .hangul { position: absolute; font-family: 'Jua', sans-serif; font-size: 60px; color: #4ECDC4; font-weight: bold; animation: float 3s ease-in-out infinite; }
+        .h-1 { top: 150px; left: 150px; color: #FF6B6B; animation-delay: 0s; font-size: 80px; transform: rotate(-10deg); }
+        .h-2 { bottom: 150px; right: 250px; color: #FFD93D; animation-delay: 1s; font-size: 70px; transform: rotate(10deg); }
+        .h-3 { top: 100px; right: 350px; color: #4ECDC4; animation-delay: 2s; font-size: 60px; transform: rotate(5deg); }
+        @keyframes float { 0% { transform: translateY(0px) rotate(var(--r)); } 50% { transform: translateY(-15px) rotate(var(--r)); } 100% { transform: translateY(0px) rotate(var(--r)); } }
+
+        /* =========================================
+           [2페이지 스타일] 
+           ========================================= */
+        #slide-2 { padding-top: 60px; padding-left: 80px; padding-right: 80px; display: none; flex-direction: row; } 
+        #slide-2 .bg-grid { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(#E0F7FA 2px, transparent 2px), linear-gradient(90deg, #E0F7FA 2px, transparent 2px); background-size: 40px 40px; z-index: 0; }
+        #slide-2 .deco-circle { position: absolute; width: 200px; height: 200px; background-color: #FFD93D; border-radius: 50%; top: -50px; right: -50px; z-index: 1; opacity: 0.5; }
+        #slide-2 .deco-triangle { position: absolute; bottom: 50px; left: 50px; width: 0; height: 0; border-left: 30px solid transparent; border-right: 30px solid transparent; border-bottom: 50px solid #FF6B6B; transform: rotate(-15deg); z-index: 1; }
+        #slide-2 .left-col { flex: 1; z-index: 10; display: flex; justify-content: center; align-items: center; }
+        #slide-2 .right-col { flex: 1; z-index: 10; padding-left: 50px; display: flex; flex-direction: column; justify-content: center; }
+        #slide-2 .polaroid { background-color: #fff; padding: 20px 20px 60px 20px; box-shadow: 10px 10px 0px rgba(0,0,0,0.1); transform: rotate(-3deg); width: 450px; }
+        #slide-2 .polaroid img { width: 100%; height: 400px; object-fit: cover; border: 2px solid #eee; }
+        #slide-2 h1 { font-size: 64px; color: #FF6B6B; margin-bottom: 20px; text-shadow: 2px 2px 0px #fff; }
+        #slide-2 .subtitle { font-family: 'Gaegu', cursive; font-size: 36px; color: #4ECDC4; margin-bottom: 40px; background-color: #fff; display: inline-block; padding: 5px 20px; border-radius: 20px; border: 3px solid #4ECDC4; }
+        #slide-2 .steps { display: flex; flex-direction: column; gap: 25px; }
+        #slide-2 .step-item { display: flex; align-items: center; background-color: #fff; padding: 15px 25px; border-radius: 20px; box-shadow: 5px 5px 0px #FFD93D; border: 2px solid #333; }
+        #slide-2 .step-num { background-color: #FF6B6B; color: #fff; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; margin-right: 20px; flex-shrink: 0; }
+        #slide-2 .step-text { font-size: 28px; color: #333; font-family: 'Gaegu', cursive; font-weight: bold; }
+
+        /* =========================================
+           [3페이지 스타일] 
+           ========================================= */
+        #slide-3 { padding-top: 30px; display: none; flex-direction: column; }
+        #slide-3 .bg-shape { position: absolute; width: 100%; height: 250px; bottom: 0; background-color: #E0F2F1; border-radius: 50% 50% 0 0 / 80px 80px 0 0; z-index: 0; }
+        #slide-3 h1 { font-size: 50px; color: #333; margin-bottom: 30px; z-index: 10; background-color: #FFD93D; padding: 5px 30px; border-radius: 30px; box-shadow: 4px 4px 0px #FF6B6B; }
+        #slide-3 .video-container { display: flex; gap: 30px; z-index: 100; width: 1150px; justify-content: center; }
+        #slide-3 .video-card { flex: 1; background-color: #fff; border-radius: 25px; padding: 15px; border: 4px solid #4ECDC4; box-shadow: 8px 8px 0px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; position: relative; }
+        #slide-3 .iframe-box { width: 100%; height: 280px; background-color: #000; border-radius: 15px; overflow: hidden; margin-bottom: 15px; position: relative; z-index: 110; }
+        #slide-3 .iframe-box iframe { width: 100%; height: 100%; border: none; pointer-events: auto; }
+        #slide-3 .video-title { font-size: 28px; color: #333; margin-bottom: 5px; }
+        #slide-3 .video-desc { font-family: 'Gaegu', cursive; font-size: 22px; color: #666; }
+        #slide-3 .footer-text { margin-top: 25px; font-size: 32px; color: #333; font-family: 'Gaegu', cursive; z-index: 10; background-color: #fff; padding: 8px 25px; border-radius: 25px; border: 2px dashed #4ECDC4; }
+
+        /* =========================================
+           [4페이지 스타일] 
+           ========================================= */
+        #slide-4 { padding-top: 40px; display: none; flex-direction: column; }
+        #slide-4 .wave-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: repeating-linear-gradient(45deg, #fff 0, #fff 20px, #FFF9C4 20px, #FFF9C4 40px); opacity: 0.3; z-index: 0; }
+        #slide-4 h1 { font-size: 55px; color: #333; margin-bottom: 40px; z-index: 10; text-shadow: 2px 2px 0px #FFD93D; }
+        #slide-4 .main-content { display: flex; width: 1100px; gap: 60px; z-index: 100; align-items: center; justify-content: center; }
+        #slide-4 .side-section { flex: 1; display: flex; flex-direction: column; gap: 16px; align-items: center; }
+        #slide-4 .character-box { width: 400px; height: 400px; background-color: #fff; border-radius: 50%; border: 12px solid #FFD93D; overflow: hidden; display: flex; justify-content: center; align-items: center; padding: 20px; box-shadow: 10px 10px 0px #4ECDC4; }
+        #slide-4 .character-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        #slide-4 .rule-box { width: 100%; background-color: #fff; padding: 20px; border-radius: 25px; box-shadow: 5px 5px 0px #FFD93D; border: 2px solid #333; }
+        #slide-4 .rule-item { display: flex; align-items: center; margin-bottom: 10px; font-family: 'Gaegu', cursive; font-size: 28px; color: #333; }
+        #slide-4 .icon-box { width: 45px; height: 45px; background-color: #4ECDC4; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #fff; margin-right: 12px; font-size: 22px; flex-shrink: 0; }
+        #slide-4 .video-section { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 20px; position: relative; z-index: 110; }
+        #slide-4 .video-frame { width: 450px; height: 300px; background-color: #fff; padding: 10px; border-radius: 25px; border: 8px solid #FF6B6B; box-shadow: 10px 10px 0px #FFD93D; position: relative; z-index: 120; }
+        #slide-4 .iframe-box { width: 100%; height: 100%; background-color: #000; border-radius: 15px; overflow: hidden; }
+        #slide-4 .iframe-box iframe { width: 100%; height: 100%; border: none; pointer-events: auto; }
+        #slide-4 .video-caption { font-size: 28px; color: #FF6B6B; font-weight: bold; background-color: #fff; padding: 5px 20px; border-radius: 20px; border: 2px dashed #FF6B6B; }
+
+    </style>
+</head>
+<body>
+
+    <div id="presentation-window">
+        <button id="prevBtn" class="nav-btn"><i class="fas fa-chevron-left"></i></button>
+        <button id="nextBtn" class="nav-btn"><i class="fas fa-chevron-right"></i></button>
+
+        <div id="slide-1" class="slide active">
+            <div class="pattern circle-1"></div>
+            <div class="pattern circle-2"></div>
+            <div class="pattern triangle"></div>
+            <div class="pattern squiggle"></div>
+            <div class="pattern dots"></div>
+            <div class="hangul h-1" style="--r: -10deg;">ㄱ</div>
+            <div class="hangul h-2" style="--r: 10deg;">ㄴ</div>
+            <div class="hangul h-3" style="--r: 5deg;">ㄷ</div>
+            <div class="content-wrapper">
+                <div class="image-frame">
+                    <img src="https://private-us-east-1.manuscdn.com/sessionFile/7WJuUVTWD7EkPlnP7IjXRv/sandbox/slides_resource_ippn0q7p536rl1st08l37-eeb671a9-e2b-prod-sg1_1768211529703_na1fn_L2hvbWUvdWJ1bnR1L21hbWFfZGF5X3ByZXNlbnRhdGlvbi9zZWpvbmdfcmVk.webp?x-oss-process=image/resize,w_1560,h_1560/format,webp&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvN1dKdVVWVFdEN0VrUGxuUDdJalhSdi9zYW5kYm94L3NsaWRlc19yZXNvdXJjZV9pcHBuMHE3cDUzNnJsMXN0MDhsMzctZWViNjcxYTktZTJiLXByb2Qtc2cxXzE3NjgyMTE1Mjk3MDNfbmExZm5fTDJodmJXVXZkV0oxYm5SMUwyMWhiV0ZmWkdGNVgzQnlaWE5sYm5SaGRHbHZiaTl6WldwdmJtZGZjbVZrLndlYnA~eC1vc3MtcHJvY2Vzcz1pbWFnZS9yZXNpemUsd18xNTYwLGhfMTU2MC9mb3JtYXQsd2VicCIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTc5ODc2MTYwMH19fV19&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=O9A8VdkVzLVbEBDTqj0gdIQ12~rJzZo9C76-GCrSXvqJaxxsJDU2mtWRz33rHVjNJfRvNUiZkWHLMBvh1TyFnfs6bp7vm8S023a5QuKukgOokmgsPdZLHvFofUOHBmglxgEWEn0rUfsVxOJBkDCrgh8FYKEo5uHWIXHWTtfoQWq5k9ZlgzF5k4UIyhE784V2LuajTpvGvxyaQ5~lL0xiZDWQfAG5i2eZvts-er4D1IdwnPkz0FFPLPGmBwSlLRYeU066rhrY0X~GYAEPRWNODzCbX7gs6ci~oafWZ6Mar53THkDGMY5U4kKM9k6Ql8zMt94-c36tV56891BnXnYn5A__" alt="세종대왕">
+                </div>
+                <div class="title-box">
+                    <h1>세종대왕과 함께하는<br>한글 놀이</h1>
+                </div>
+                <h2>즐겁게 배우는 우리 한글</h2>
+            </div>
+        </div>
+
+        <div id="slide-2" class="slide">
+            <div class="bg-grid"></div>
+            <div class="deco-circle"></div>
+            <div class="deco-triangle"></div>
+            <div class="left-col">
+                <div class="polaroid">
+                    <img src="https://private-us-east-1.manuscdn.com/sessionFile/7WJuUVTWD7EkPlnP7IjXRv/sandbox/slides_resource_ippn0q7p536rl1st08l37-eeb671a9-e2b-prod-sg1_1768210868903_na1fn_L2hvbWUvdWJ1bnR1L21hbWFfZGF5X3ByZXNlbnRhdGlvbi9tYWduZXRfYm9hcmQ.jpg?x-oss-process=image/resize,w_1560,h_1560/format,webp&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvN1dKdVVWVFdEN0VrUGxuUDdJalhSdi9zYW5kYm94L3NsaWRlc19yZXNvdXJjZV9pcHBuMHE3cDUzNnJsMXN0MDhsMzctZWViNjcxYTktZTJiLXByb2Qtc2cxXzE3NjgyMTA4Njg5MDNfbmExZm5fTDJodmJXVXZkV0oxYm5SMUwyMWhiV0ZmWkdGNVgzQnlaWE5sYm5SaGRHbHZiaTl0WVdkdVpYUmZZbTloY21RLmpwZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSx3XzE1NjAsaF8xNTYwL2Zvcm1hdCx3ZWJwIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzk4NzYxNjAwfX19XX0_&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=gwXQg0iksu8JYbS2GNRhbIxAsU4nIqkNrbgoaEgvJ-5jOeyDqylWoIv8XtlXcN2bk4jlB10txuICpCnO006XU2DMkG6soOwy~KnXDEJ--EgE8scQsacx9Mi~H7GQnwjJeRNk6s1r97kL9Xv22UvQT~kYVt--xwuJMruLCMCL2CDg51bjTvwxzMghEIa27tmM-rZKVdO-3Nc4hjHXCGqnV8jz8RJUdf5k4UrawnGU31RbWGW2CU1s0PoEONSCVHZKBpx4GYxEBRPpx3lgmFiqgb23iNtUDz5HxNF6mSZyNw-HUBsso-V2~shEkEo5yOnO99EIClg2fQ13gbds4tFyfA__" alt="마그넷 보드">
+                </div>
+            </div>
+            <div class="right-col">
+                <h1>자석 글자로<br>한글 만들기</h1>
+                <div class="subtitle">ㄱ부터 ㅎ까지 자석 글자를 붙여요!</div>
+                <div class="steps">
+                    <div class="step-item">
+                        <div class="step-num">1</div>
+                        <div class="step-text">선생님이 자음을 하나씩 소개해요</div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-num">2</div>
+                        <div class="step-text">자석 글자를 찾아 보드에 붙여요</div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-num">3</div>
+                        <div class="step-text">함께 큰 소리로 읽어봐요</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="slide-3" class="slide">
+            <div class="bg-shape"></div>
+            <h1>똘똘이와 함께 한글요가!</h1>
+            <div class="video-container">
+                <div class="video-card">
+                    <div class="iframe-box">
+                        <iframe id="video3-1" src="https://www.youtube.com/embed/lLw6SIlOP6E?rel=0&modestbranding=1&enablejsapi=1" allowfullscreen></iframe>
+                    </div>
+                    <div class="video-title">ㄱ부터 ㅅ까지</div>
+                    <div class="video-desc">똘똘이 동요 한글요가 1편</div>
+                </div>
+                <div class="video-card" style="border-color: #FF6B6B;">
+                    <div class="iframe-box">
+                        <iframe id="video3-2" src="https://www.youtube.com/embed/jb0vqqorlR8?rel=0&modestbranding=1&enablejsapi=1" allowfullscreen></iframe>
+                    </div>
+                    <div class="video-title">ㅈ부터 ㅎ까지</div>
+                    <div class="video-desc">똘똘이 동요 한글요가 2편</div>
+                </div>
+            </div>
+            <div class="footer-text">"화면 속 영상을 눌러서 똘똘이를 따라해봐요!"</div>
+        </div>
+
+        <div id="slide-4" class="slide">
+            <div class="wave-bg"></div>
+            <h1>음악과 함께 신나게 놀아요!</h1>
+            <div class="main-content">
+                <div class="side-section">
+                    <div class="character-box">
+                        <img src="https://private-us-east-1.manuscdn.com/sessionFile/7WJuUVTWD7EkPlnP7IjXRv/sandbox/slides_resource_ippn0q7p536rl1st08l37-eeb671a9-e2b-prod-sg1_1768213437024_na1fn_L2hvbWUvdWJ1bnR1L21hbWFfZGF5X3ByZXNlbnRhdGlvbi9oYW5ndWxfY2hhcmFjdGVy.jpg?x-oss-process=image/resize,w_1560,h_1560/format,webp&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvN1dKdVVWVFdEN0VrUGxuUDdJalhSdi9zYW5kYm94L3NsaWRlc19yZXNvdXJjZV9pcHBuMHE3cDUzNnJsMXN0MDhsMzctZWViNjcxYTktZTJiLXByb2Qtc2cxXzE3NjgyMTM0MzcwMjRfbmExZm5fTDJodmJXVXZkV0oxYm5SMUwyMWhiV0ZmWkdGNVgzQnlaWE5sYm5SaGRHbHZiaTlvWVc1bmRXeGZZMmhoY21GamRHVnkuanBnP3gtb3NzLXByb2Nlc3M9aW1hZ2UvcmVzaXplLHdfMTU2MCxoXzE1NjAvZm9ybWF0LHdlYnAiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3OTg3NjE2MDB9fX1dfQ__&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=dhRlgdXCSRob1ICTh2vgPD8l6tEynIz7-0MoahiByoE14BHMFIs0gXQbij~wkvefL8qqaClizPCvXsSL-Id-4g6g-zd5XpTVqxAIbAzt468-93kkGwc1ouXxJ6fxADWl-4-1s5Bzct~Ofhc5cNcEaSbR4r~zzFdQFwoQl0HhJ0UhSNOLczPrUnUudBeTrBA-mp4xk9q2BcBAHosJvgtS0HLTg-7MiaN7Cgwwga9G6II6S-jXLgKOnvs7VcPWAl3eZpAGu2bnB3rMvp5P8beiWTTC6jTR9beOGdsGj6iwRDRhFVKUVZw-0CpeQuuIS-Sxc~j3r9KHd66ZzGE13gSipg__" alt="한글 캐릭터">
+                    </div>
+                    <div class="rule-box">
+                        <div class="rule-item"><div class="icon-box"><i class="fas fa-music"></i></div>음악이 나오면 춤춰요</div>
+                        <div class="rule-item"><div class="icon-box" style="background-color: #FF6B6B;"><i class="fas fa-stop-circle"></i></div>멈추면 그대로 멈춰라!</div>
+                    </div>
+                </div>
+                <div class="video-section">
+                    <div class="video-frame">
+                        <div class="iframe-box">
+                            <iframe id="video4-1" src="https://www.youtube.com/embed/oEPZ6XjS8d0?rel=0&modestbranding=1&enablejsapi=1" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                    <div class="video-caption">화면을 눌러 게임 시작!</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 슬라이드 기능 스크립트
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        function updateSlide() {
+            // 모든 슬라이드 숨기기 및 영상 멈추기
+            slides.forEach(slide => {
+                slide.classList.remove('active');
+                slide.style.display = 'none'; // 완전히 숨김
+                
+                // 해당 슬라이드 내의 모든 iframe에 멈춤 명령 보내기
+                const iframes = slide.querySelectorAll('iframe');
+                iframes.forEach(iframe => {
+                    iframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+                });
+            });
+
+            // 현재 슬라이드 보이기
+            slides[currentSlide].style.display = (currentSlide === 1) ? 'flex' : (currentSlide >= 2 ? 'flex' : 'flex'); // Flex 속성 유지
+            if(currentSlide === 1) slides[currentSlide].style.flexDirection = 'row'; // 2페이지 예외처리
+            else slides[currentSlide].style.flexDirection = 'column'; // 나머지 페이지
+            
+            // 약간의 딜레이 후 opacity 효과 (부드러운 전환)
+            setTimeout(() => {
+                slides[currentSlide].classList.add('active');
+            }, 10);
+            
+            // 버튼 상태 업데이트
+            prevBtn.style.display = currentSlide === 0 ? 'none' : 'flex';
+            nextBtn.style.display = currentSlide === totalSlides - 1 ? 'none' : 'flex';
+        }
+
+        // 초기화
+        updateSlide();
+
+        // 버튼 클릭 이벤트
+        nextBtn.addEventListener('click', () => {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        });
+    </script>
+</body>
+</html>
